@@ -174,12 +174,12 @@ port1.on("open", function() {
 						operating_hours: data.operating_hours,
 						error_0: (data.errors.indexOf("t_sensor_failure") > -1),
 						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure") > -1),
-						error_2: (data.errors.indexOf("g1_under_min" > -1),
-						error_3: (data.errors.indexOf("g2_under_min" > -1),
-						error_4: (data.errors.indexOf("g1_over_max" > -1),
-						error_5: (data.errors.indexOf("g2_over_max" > -1),
-						error_6: (data.errors.indexOf("dt_under_min" > -1),
-						error_7: (data.errors.indexOf("power_failure" > -1)
+						error_2: (data.errors.indexOf("g1_under_min") > -1),
+						error_3: (data.errors.indexOf("g2_under_min") > -1),
+						error_4: (data.errors.indexOf("g1_over_max") > -1),
+						error_5: (data.errors.indexOf("g2_over_max") > -1),
+						error_6: (data.errors.indexOf("dt_under_min") > -1),
+						error_7: (data.errors.indexOf("power_failure") > -1)
 				    }
 				},
 				{
