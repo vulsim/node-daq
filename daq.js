@@ -30,7 +30,7 @@ var influx = new Influx.InfluxDB({
 			tags: [],
 			fields: {
 				device_type: Influx.FieldType.STRING,
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				fw_version: Influx.FieldType.INTEGER,
 				device_date: Influx.FieldType.STRING,
 				operating_hours: Influx.FieldType.INTEGER,
@@ -41,7 +41,7 @@ var influx = new Influx.InfluxDB({
 			measurement: util.format("%s.heatmeter.g", influxNode),
 			tags: [],
 			fields: {
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
 		},
@@ -49,7 +49,7 @@ var influx = new Influx.InfluxDB({
 			measurement: util.format("%s.heatmeter.q", influxNode),
 			tags: [],
 			fields: {
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
 		},
@@ -57,7 +57,7 @@ var influx = new Influx.InfluxDB({
 			measurement: util.format("%s.heatmeter.v", influxNode),
 			tags: [],
 			fields: {
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
 		},
@@ -65,7 +65,7 @@ var influx = new Influx.InfluxDB({
 			measurement: util.format("%s.heatmeter.t1", influxNode),
 			tags: [],
 			fields: {
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
 		},
@@ -73,7 +73,7 @@ var influx = new Influx.InfluxDB({
 			measurement: util.format("%s.heatmeter.t2", influxNode),
 			tags: [],
 			fields: {
-				device_serial: Influx.FieldType.STRING,
+				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
 		}
@@ -165,7 +165,7 @@ port1.on("open", function() {
 				    	device_date: data.date.toString(),
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
-						errors: data.errors 
+						errors: JSON.stringify(data.errors) 
 				    }
 				},
 				{
@@ -202,7 +202,7 @@ port1.on("open", function() {
 				    	device_serial: data.device_serial,
 						value: data.t2
 				    }
-				},
+				}
 			]);
 		}
 	});

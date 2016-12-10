@@ -19,7 +19,7 @@ var readUInt24LE = function(buffer, index) {
 	return buffer[index] + (buffer[index + 1] << 8) + (buffer[index + 2] << 16);
 };
 
-var readHeatmeterConfig = function (buffer, index) {
+var readDeviceConfig = function (buffer, index) {
 
 	var result = [];
 
@@ -222,7 +222,7 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 							readBcd8(rawData, 0x0)),
 							"device_serial": rawData.readUInt16LE(0xE),
 							"fw_version": rawData[0x10],
-							"device_config": readHeatmeterConfig(rawData, 0x11),
+							"device_config": readDeviceConfig(rawData, 0x11),
 							"operating_hours": rawData[0x18] / 60 + readUInt24LE(rawData, 0x19),
 							"g1_min": readMaxConsumption(rawData, 0x12) * (rawData[0x14] & 0xF) / 100,
 							"g1_max": readMaxConsumption(rawData, 0x12),
