@@ -15,7 +15,8 @@ var daqNode = "teplouzel";
 var daqHost = "vrb86_1"
 var serialDevice1 = "/dev/ttyUSB0";
 
-var logMessage1 = "->\tRead data from device\t\t\t%s";
+var logMessage1 = "->\tRead data from device\t\t\t\t%s";
+var logMessage2 = "->\tStarting of scheduled devices polling\t\t\t\t%s";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -169,7 +170,7 @@ port1.on("open", function() {
 	var syncTimerId = setInterval(function() {
 		if ((syncBufferSize == 0 && rawReadBuffer1 == null) ||
 			(rawReadBuffer1 != null && syncBufferSize == rawReadBuffer1.length)) {
-			clearInterval(rawReadTimerId);
+			clearInterval(syncTimerId);
 			getDeviceData();
 		} if (rawReadBuffer1 != null) {
 			syncBufferSize = rawReadBuffer1.length; 
@@ -180,7 +181,12 @@ port1.on("open", function() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var daq_job = schedule.scheduleJob("*/1 * * * *", function() {
-	port1.open();
+	try {
+		port1.open();
+		console.log(util.format(logMessage2, "OK"));
+	} catch (err) {
+		console.log(util.format(logMessage2, "FAILED"));
+	}	
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
