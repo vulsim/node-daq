@@ -65,7 +65,7 @@ var tem05m1 = new Tem05m1("Tem05m1", {
 		error: function(message) {
 			console.log("ERROR\t" + message);
 		}
-	};
+	}
 });
 
 var port1 = new SerialPort(serialDevice1, {
@@ -121,7 +121,7 @@ port1.on("open", function() {
 		port1.close();
 
 		if (err) {
-		    console.log(format(logMessage1, "FAILED");		    
+		    console.log(String.format(logMessage1, "FAILED"));		    
 		} else {
 			console.log(String.format(logMessage1, "OK"));
 			console.log(String.format("\t\- Device serial: %d, fw: %d", data.device_serial, data.fw_version));
