@@ -34,14 +34,14 @@ var influx = new Influx.InfluxDB({
 				device_date: Influx.FieldType.STRING,
 				fw_version: Influx.FieldType.INTEGER,
 				operating_hours: Influx.FieldType.INTEGER,
-				error_0: Influx.FieldType.BOOLEAN,
-				error_1: Influx.FieldType.BOOLEAN,
-				error_2: Influx.FieldType.BOOLEAN,
-				error_3: Influx.FieldType.BOOLEAN,
-				error_4: Influx.FieldType.BOOLEAN,
-				error_5: Influx.FieldType.BOOLEAN,
-				error_6: Influx.FieldType.BOOLEAN,
-				error_7: Influx.FieldType.BOOLEAN
+				error_0: Influx.FieldType.INTEGER,
+				error_1: Influx.FieldType.INTEGER,
+				error_2: Influx.FieldType.INTEGER,
+				error_3: Influx.FieldType.INTEGER,
+				error_4: Influx.FieldType.INTEGER,
+				error_5: Influx.FieldType.INTEGER,
+				error_6: Influx.FieldType.INTEGER,
+				error_7: Influx.FieldType.INTEGER
 			}
 		},
 		{
@@ -172,14 +172,14 @@ port1.on("open", function() {
 				    	device_date: data.date.toString(),					
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
-						error_0: (data.errors.indexOf("t_sensor_failure") > -1),
-						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure") > -1),
-						error_2: (data.errors.indexOf("g1_under_min") > -1),
-						error_3: (data.errors.indexOf("g2_under_min") > -1),
-						error_4: (data.errors.indexOf("g1_over_max") > -1),
-						error_5: (data.errors.indexOf("g2_over_max") > -1),
-						error_6: (data.errors.indexOf("dt_under_min") > -1),
-						error_7: (data.errors.indexOf("power_failure") > -1)
+						error_0: (data.errors.indexOf("t_sensor_failure") > -1) ? 1 : 0,
+						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure") > -1) ? 1 : 0,
+						error_2: (data.errors.indexOf("g1_under_min") > -1) ? 1 : 0,
+						error_3: (data.errors.indexOf("g2_under_min") > -1) ? 1 : 0,
+						error_4: (data.errors.indexOf("g1_over_max") > -1) ? 1 : 0,
+						error_5: (data.errors.indexOf("g2_over_max") > -1) ? 1 : 0,
+						error_6: (data.errors.indexOf("dt_under_min") > -1) ? 1 : 0,
+						error_7: (data.errors.indexOf("power_failure") > -1 ? 1 : 0)
 				    }
 				},
 				{
