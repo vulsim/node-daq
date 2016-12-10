@@ -26,15 +26,22 @@ var influx = new Influx.InfluxDB({
   	password: influxDatabasePassword,
 	schema: [
 		{
-			measurement: util.format("%s.heatmeter", influxNode),
+			measurement: util.format("%s.heatmeter.info", influxNode),
 			tags: [],
 			fields: {
 				device_type: Influx.FieldType.STRING,
 				device_serial: Influx.FieldType.INTEGER,
-				fw_version: Influx.FieldType.INTEGER,
 				device_date: Influx.FieldType.STRING,
+				fw_version: Influx.FieldType.INTEGER,
 				operating_hours: Influx.FieldType.INTEGER,
-				errors: Influx.FieldType.STRING
+				error_0: Influx.FieldType.BOOLEAN,
+				error_1: Influx.FieldType.BOOLEAN,
+				error_2: Influx.FieldType.BOOLEAN,
+				error_3: Influx.FieldType.BOOLEAN,
+				error_4: Influx.FieldType.BOOLEAN,
+				error_5: Influx.FieldType.BOOLEAN,
+				error_6: Influx.FieldType.BOOLEAN,
+				error_7: Influx.FieldType.BOOLEAN
 			}
 		},
 		{
@@ -154,18 +161,25 @@ port1.on("open", function() {
 		    console.log(util.format(logMessage1, "FAILED"));		    
 		} else {
 			console.log(util.format(logMessage1, "OK"));
-			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
+			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %d", data.device_serial, data.fw_version, data.errors.length));
 
 			influx.writePoints([
 				{
-					measurement: util.format("%s.heatmeter", influxNode),
+					measurement: util.format("%s.heatmeter.info", influxNode),
 				    fields: {
-				    	device_type: "ТЭМ-05М-1",
+				    	device_type: "tem05m1",
 				    	device_serial: data.device_serial,
-				    	device_date: data.date.toString(),
+				    	device_date: data.date.toString(),					
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
-						errors: JSON.stringify(data.errors) 
+						error_0: (data.errors.indexOf("t_sensor_failure") > -1),
+						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure" > -1),
+						error_2: (data.errors.indexOf("g1_under_min" > -1),
+						error_3: (data.errors.indexOf("g2_under_min" > -1),
+						error_4: (data.errors.indexOf("g1_over_max" > -1),
+						error_5: (data.errors.indexOf("g2_over_max" > -1),
+						error_6: (data.errors.indexOf("dt_under_min" > -1),
+						error_7: (data.errors.indexOf("power_failure" > -1)
 				    }
 				},
 				{
