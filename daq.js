@@ -2,13 +2,17 @@
 var schedule = require("node-schedule");
 var Influx = require("influx");
 var SerialPort = require('serialport');
+var util = require("util");
 var Tem05m1 = require("./helpers/tem05m1").Tem05m1;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var influxHost = "192.168.111.1";
-var daqNode = "garant";
-var daqHost = "vrb86"
+var influxDatabase = "garant";
+var influxDatabaseUser = "daq";
+var influxDatabasePassword = "influx";
+var daqNode = "teplouzel";
+var daqHost = "vrb86_1"
 var serialDevice1 = "/dev/ttyUSB0";
 
 var logMessage1 = "->\tRead data from device\t\t\t%s";
@@ -17,7 +21,9 @@ var logMessage1 = "->\tRead data from device\t\t\t%s";
 
 var influx = new Influx.InfluxDB({
 	host: influxHost,
-	database: daqNode,
+	database: influxDatabase,
+	username: influxDatabaseUser,
+  	password: influxDatabasePassword,
 	schema: [
 		{
 			measurement: "heatmeter_tem05m1",
@@ -43,9 +49,9 @@ var influx = new Influx.InfluxDB({
 				v2: Influx.FieldType.FLOAT,
 				m2: Influx.FieldType.FLOAT,
 				t2: Influx.FieldType.FLOAT,
-				errors: Influx.FieldType.INTEGER
+				errors: Influx.FieldType.STRING
 			},
-			tags: ["host"]
+			tags: ["host", "node"]
 		}
 	]
 });
@@ -121,14 +127,14 @@ port1.on("open", function() {
 		port1.close();
 
 		if (err) {
-		    console.log(String.format(logMessage1, "FAILED"));		    
+		    console.log(util.format(logMessage1, "FAILED"));		    
 		} else {
-			console.log(String.format(logMessage1, "OK"));
-			console.log(String.format("\t\- Device serial: %d, fw: %d", data.device_serial, data.fw_version));
+			console.log(util.format(logMessage1, "OK"));
+			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
 
 			influx.writePoints([{
 				measurement: "heatmeter_tem05m1",
-			    tags: { host: daqHost },
+			    tags: { host: daqHost, node: daqNode},
 			    fields: { 
 			    	device_serial: data.device_serial,
 					fw_version: data.fw_version,
