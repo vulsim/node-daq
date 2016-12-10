@@ -210,7 +210,7 @@ port1.on("open", function() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var daq_job = schedule.scheduleJob("*/1 * * * *", function() {
+var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {
 		port1.open();
 		console.log(util.format(logMessage2, "OK"));

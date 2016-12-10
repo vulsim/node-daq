@@ -213,8 +213,6 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 							year += 1900;
 						}
 
-						console.log(readUInt24LE(rawData, 0x20));
-
 						cb(null, {
 							"date": new Date(year, 
 							readBcd8(rawData, 0x8) - 1, 
