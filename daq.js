@@ -11,7 +11,7 @@ var influxHost = "192.168.1.111";
 var influxDatabase = "garant";
 var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
-var daqNode = "vrb86_1"
+var influxNode = "vrb86_1"
 var serialDevice1 = "/dev/ttyUSB0";
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
@@ -26,54 +26,50 @@ var influx = new Influx.InfluxDB({
   	password: influxDatabasePassword,
 	schema: [
 		{
-			measurement: "heatmeter",
+			measurement: util.format("%s.heatmeter", influxNode),
 			fields: {
+				device_type: Influx.FieldType.STRING,
 				device_serial: Influx.FieldType.STRING,
 				fw_version: Influx.FieldType.INTEGER,
+				device_date: Influx.FieldType.STRING
 				operating_hours: Influx.FieldType.INTEGER,
 				errors: Influx.FieldType.STRING
-			},
-			tags: ["node"]
+			}
 		},
 		{
-			measurement: "heatmeter.g",
+			measurement: util.format("%s.heatmeter.g", influxNode),
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				value: Influx.FieldType.FLOAT,
-			},
-			tags: ["node"]
+			}
 		},
 		{
-			measurement: "heatmeter.q",
+			measurement: util.format("%s.heatmeter.q", influxNode),
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				value: Influx.FieldType.FLOAT,
-			},
-			tags: ["node"]
+			}
 		},
 		{
-			measurement: "heatmeter.v",
+			measurement: util.format("%s.heatmeter.v", influxNode),
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				value: Influx.FieldType.FLOAT,
-			},
-			tags: ["node"]
+			}
 		},
 		{
-			measurement: "heatmeter.t1",
+			measurement: util.format("%s.heatmeter.t1", influxNode),
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				value: Influx.FieldType.FLOAT,
-			},
-			tags: ["node"]
+			}
 		},
 		{
-			measurement: "heatmeter.t2",
+			measurement: util.format("%s.heatmeter.t2", influxNode),
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				value: Influx.FieldType.FLOAT,
-			},
-			tags: ["node"]
+			}
 		}
 	]
 });
@@ -156,50 +152,46 @@ port1.on("open", function() {
 
 			influx.writePoints([
 				{
-					measurement: "heatmeter",
-				    tags: { node: daqNode},
-				    fields: { 
+					measurement: util.format("%s.heatmeter", influxNode),
+				    fields: {
+				    	device_type: "ТЭМ-05М-1"
 				    	device_serial: data.device_serial,
+				    	device_date: data.date.toString(),
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
 						errors: data.errors 
 				    }
 				},
 				{
-					measurement: "heatmeter.g",
-				    tags: { node: daqNode},
+					measurement: util.format("%s.heatmeter.g", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.g1
 				    }
 				},
 				{
-					measurement: "heatmeter.q",
-				    tags: { node: daqNode},
+					measurement: util.format("%s.heatmeter.q", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.q1
 				    }
 				},
 				{
-					measurement: "heatmeter.v",
-				    tags: { node: daqNode},
+					measurement: util.format("%s.heatmeter.v", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.v1
 				    }
 				},
 				{
-					measurement: "heatmeter.t1",
-				    tags: { node: daqNode},
+					measurement: util.format("%s.heatmeter.t1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.t1
 				    }
 				},
 				{
-					measurement: "heatmeter.t2",
-				    tags: { node: daqNode},
+					measurement: util.format("%s.heatmeter.t2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.t2
