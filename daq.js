@@ -27,48 +27,54 @@ var influx = new Influx.InfluxDB({
 	schema: [
 		{
 			measurement: util.format("%s.heatmeter", influxNode),
+			tags: [],
 			fields: {
 				device_type: Influx.FieldType.STRING,
 				device_serial: Influx.FieldType.STRING,
 				fw_version: Influx.FieldType.INTEGER,
-				device_date: Influx.FieldType.STRING
+				device_date: Influx.FieldType.STRING,
 				operating_hours: Influx.FieldType.INTEGER,
 				errors: Influx.FieldType.STRING
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.g", influxNode),
+			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.STRING,
-				value: Influx.FieldType.FLOAT,
+				value: Influx.FieldType.FLOAT
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.q", influxNode),
+			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.STRING,
-				value: Influx.FieldType.FLOAT,
+				value: Influx.FieldType.FLOAT
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.v", influxNode),
+			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.STRING,
-				value: Influx.FieldType.FLOAT,
+				value: Influx.FieldType.FLOAT
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.t1", influxNode),
+			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.STRING,
-				value: Influx.FieldType.FLOAT,
+				value: Influx.FieldType.FLOAT
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.t2", influxNode),
+			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.STRING,
-				value: Influx.FieldType.FLOAT,
+				value: Influx.FieldType.FLOAT
 			}
 		}
 	]
@@ -154,7 +160,7 @@ port1.on("open", function() {
 				{
 					measurement: util.format("%s.heatmeter", influxNode),
 				    fields: {
-				    	device_type: "ТЭМ-05М-1"
+				    	device_type: "ТЭМ-05М-1",
 				    	device_serial: data.device_serial,
 				    	device_date: data.date.toString(),
 						fw_version: data.fw_version,
