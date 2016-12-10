@@ -173,7 +173,7 @@ port1.on("open", function() {
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
 						error_0: (data.errors.indexOf("t_sensor_failure") > -1),
-						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure" > -1),
+						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure") > -1),
 						error_2: (data.errors.indexOf("g1_under_min" > -1),
 						error_3: (data.errors.indexOf("g2_under_min" > -1),
 						error_4: (data.errors.indexOf("g1_over_max" > -1),
