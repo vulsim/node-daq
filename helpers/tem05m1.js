@@ -186,7 +186,21 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 	var that = this;
 
 	try {
-		var pollDevice = function () {
+		var syncWithDeviceIterator = function (index, syncCb) {
+			if (index < 6) {
+				rawReadFunc(1000, function (err, rawData) {
+					if (rawData == null || rawData.length == 0) {
+						syncCb();
+					} else {
+						syncWithDeviceIterator(index + 1, syncCb);
+					}
+				});
+			} else {
+				cb(new Error("Can't perform synchronization"));
+			}
+		};
+
+		syncWithDeviceIterator(0, function () {
 			rawReadFunc(3000, function (err, rawData) {
 				try {				
 					if (rawData && rawData.length == 344) {
@@ -240,22 +254,7 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 					cb(e);
 				}
 			});
-		};
-
-		var syncWithDeviceIterator = function (index) {
-			if (index < 10) {
-				rawReadFunc(1000, function (err, rawData) {
-					if (rawData == null || rawData.length == 0) {
-						pollDevice();
-					} else {
-						syncWithDeviceIterator(index + 1);
-					}
-				});
-			} else {
-				cb(new Error("Can't perform synchronization"));
-			}
-		};
-
+		});
 	} catch (e) {
 		that.journal.error(e.stack.toString());
 		cb(e);
