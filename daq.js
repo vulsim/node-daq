@@ -123,46 +123,58 @@ port1.on("open", function() {
 		}						
 	};
 
-	tem05m1.getOperatingParams(readHandler, writeHandler, function (err, data) {
-		port1.close();
+	var getDeviceData = function () {
+		tem05m1.getOperatingParams(readHandler, writeHandler, function (err, data) {
+			port1.close();
 
-		if (err) {
-		    console.log(util.format(logMessage1, "FAILED"));		    
-		} else {
-			console.log(util.format(logMessage1, "OK"));
-			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
+			if (err) {
+			    console.log(util.format(logMessage1, "FAILED"));		    
+			} else {
+				console.log(util.format(logMessage1, "OK"));
+				console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
 
-			influx.writePoints([{
-				measurement: "heatmeter_tem05m1",
-			    tags: { host: daqHost, node: daqNode},
-			    fields: { 
-			    	device_serial: data.device_serial,
-					fw_version: data.fw_version,
-					operating_hours: data.operating_hours,
-					g1_min: data.g1_min,
-					g1_max: data.g1_max,
-					g2_min: data.g2_min,
-					g2_max: data.g2_max,
-					t3_prog: data.t3_prog,
-					t3: data.t3,
-					g1: data.g1,
-					p1: data.p1,
-					q1: data.q1,
-					v1: data.v1,
-					m1: data.m1,
-					t1: data.t1,
-					g2: data.g2,
-					p2: data.p2,
-					q2: data.q2,
-					v2: data.v2,
-					m2: data.m2,
-					t2: data.t2,
-					errors: data.errors 
-			    }
-			}]);
+				influx.writePoints([{
+					measurement: "heatmeter_tem05m1",
+				    tags: { host: daqHost, node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						fw_version: data.fw_version,
+						operating_hours: data.operating_hours,
+						g1_min: data.g1_min,
+						g1_max: data.g1_max,
+						g2_min: data.g2_min,
+						g2_max: data.g2_max,
+						t3_prog: data.t3_prog,
+						t3: data.t3,
+						g1: data.g1,
+						p1: data.p1,
+						q1: data.q1,
+						v1: data.v1,
+						m1: data.m1,
+						t1: data.t1,
+						g2: data.g2,
+						p2: data.p2,
+						q2: data.q2,
+						v2: data.v2,
+						m2: data.m2,
+						t2: data.t2,
+						errors: data.errors 
+				    }
+				}]);
+			}
+		});
+	};
+
+	var syncBufferSize = 0;
+	var syncTimerId = setInterval(function() {
+		if ((syncBufferSize == 0 && rawReadBuffer1 == null) ||
+			(rawReadBuffer1 != null && syncBufferSize == rawReadBuffer1.length)) {
+			clearInterval(rawReadTimerId);
+			getDeviceData();
+		} if (rawReadBuffer1 != null) {
+			syncBufferSize = rawReadBuffer1.length; 
 		}
-	});
-
+	}, 500);
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
