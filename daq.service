@@ -2,10 +2,10 @@
 Description=DAQ poll service
 
 [Service]
-ExecStart=/usr/local/bin/node /opt/nodeserver/server.js
-KillMode=process
+ExecStart=/usr/bin/node /opt/daq/daq.js
 Restart=on-failure
 RestartSec=120
+KillMode=process
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=node-daq
@@ -14,3 +14,4 @@ Group=pi
 
 [Install]
 WantedBy=multi-user.target
+Alias=daqd.service
