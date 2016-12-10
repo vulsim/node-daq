@@ -50,7 +50,7 @@ var influx = new Influx.InfluxDB({
 	]
 });
 
-var rawReadBuffer1: null;
+var rawReadBuffer1 = null;
 
 var tem05m1 = new Tem05m1("Tem05m1", {
 	journal: {
@@ -119,7 +119,7 @@ port1.on("open", function() {
 
 	tem05m1.getOperatingParams(readHandler, writeHandler, function (err, data) {
 		port1.close();
-		
+
 		if (err) {
 		    console.log(format(logMessage1, "FAILED");		    
 		} else {
