@@ -7,16 +7,15 @@ var Tem05m1 = require("./helpers/tem05m1").Tem05m1;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var influxHost = "192.168.111.1";
+var influxHost = "192.168.1.111";
 var influxDatabase = "garant";
 var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
-var daqNode = "teplouzel";
-var daqHost = "vrb86_1"
+var daqNode = "vrb86_1"
 var serialDevice1 = "/dev/ttyUSB0";
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
-var logMessage2 = "->\tStarting of scheduled devices polling\t\t\t\t%s";
+var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27,32 +26,54 @@ var influx = new Influx.InfluxDB({
   	password: influxDatabasePassword,
 	schema: [
 		{
-			measurement: "heatmeter_tem05m1",
+			measurement: "heatmeter",
 			fields: {
 				device_serial: Influx.FieldType.STRING,
 				fw_version: Influx.FieldType.INTEGER,
 				operating_hours: Influx.FieldType.INTEGER,
-				g1_min: Influx.FieldType.FLOAT,
-				g1_max: Influx.FieldType.FLOAT,
-				g2_min: Influx.FieldType.FLOAT,
-				g2_max: Influx.FieldType.FLOAT,
-				t3_prog: Influx.FieldType.FLOAT,
-				t3: Influx.FieldType.FLOAT,
-				g1: Influx.FieldType.FLOAT,
-				p1: Influx.FieldType.FLOAT,
-				q1: Influx.FieldType.FLOAT,
-				v1: Influx.FieldType.FLOAT,
-				m1: Influx.FieldType.FLOAT,
-				t1: Influx.FieldType.FLOAT,
-				g2: Influx.FieldType.FLOAT,
-				p2: Influx.FieldType.FLOAT,
-				q2: Influx.FieldType.FLOAT,
-				v2: Influx.FieldType.FLOAT,
-				m2: Influx.FieldType.FLOAT,
-				t2: Influx.FieldType.FLOAT,
 				errors: Influx.FieldType.STRING
 			},
-			tags: ["host", "node"]
+			tags: ["node"]
+		},
+		{
+			measurement: "heatmeter.g",
+			fields: {
+				device_serial: Influx.FieldType.STRING,
+				value: Influx.FieldType.FLOAT,
+			},
+			tags: ["node"]
+		},
+		{
+			measurement: "heatmeter.q",
+			fields: {
+				device_serial: Influx.FieldType.STRING,
+				value: Influx.FieldType.FLOAT,
+			},
+			tags: ["node"]
+		},
+		{
+			measurement: "heatmeter.v",
+			fields: {
+				device_serial: Influx.FieldType.STRING,
+				value: Influx.FieldType.FLOAT,
+			},
+			tags: ["node"]
+		},
+		{
+			measurement: "heatmeter.t1",
+			fields: {
+				device_serial: Influx.FieldType.STRING,
+				value: Influx.FieldType.FLOAT,
+			},
+			tags: ["node"]
+		},
+		{
+			measurement: "heatmeter.t2",
+			fields: {
+				device_serial: Influx.FieldType.STRING,
+				value: Influx.FieldType.FLOAT,
+			},
+			tags: ["node"]
 		}
 	]
 });
@@ -99,18 +120,18 @@ port1.on("open", function() {
 				try {
 					clearInterval(rawReadTimerId);
 
-					if (rawReadBuffer1) {
+					if (rawReadBuffer1 != null) {
 						rawReadCb(null, rawReadBuffer1);
 						rawReadBuffer1 = null;
 					} else {
-						rawReadCb(new Error("No data received"), null);
+						rawReadCb(null, null);
 					}			
 				} catch (e) {
-					rawReadCb(e);
+					rawReadCb(e, null);
 				}
 			}, timeout);
 		} catch (e) {
-			rawReadCb(e);
+			rawReadCb(e, null);
 		}						
 	};
 
@@ -124,58 +145,69 @@ port1.on("open", function() {
 		}						
 	};
 
-	var getDeviceData = function () {
-		tem05m1.getOperatingParams(readHandler, writeHandler, function (err, data) {
-			port1.close();
+	tem05m1.getOperatingParams(readHandler, writeHandler, function (err, data) {
+		port1.close();
 
-			if (err) {
-			    console.log(util.format(logMessage1, "FAILED"));		    
-			} else {
-				console.log(util.format(logMessage1, "OK"));
-				console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
+		if (err) {
+		    console.log(util.format(logMessage1, "FAILED"));		    
+		} else {
+			console.log(util.format(logMessage1, "OK"));
+			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %s", data.device_serial, data.fw_version, data.errors));
 
-				influx.writePoints([{
-					measurement: "heatmeter_tem05m1",
-				    tags: { host: daqHost, node: daqNode},
+			influx.writePoints([
+				{
+					measurement: "heatmeter",
+				    tags: { node: daqNode},
 				    fields: { 
 				    	device_serial: data.device_serial,
 						fw_version: data.fw_version,
 						operating_hours: data.operating_hours,
-						g1_min: data.g1_min,
-						g1_max: data.g1_max,
-						g2_min: data.g2_min,
-						g2_max: data.g2_max,
-						t3_prog: data.t3_prog,
-						t3: data.t3,
-						g1: data.g1,
-						p1: data.p1,
-						q1: data.q1,
-						v1: data.v1,
-						m1: data.m1,
-						t1: data.t1,
-						g2: data.g2,
-						p2: data.p2,
-						q2: data.q2,
-						v2: data.v2,
-						m2: data.m2,
-						t2: data.t2,
 						errors: data.errors 
 				    }
-				}]);
-			}
-		});
-	};
-
-	var syncBufferSize = 0;
-	var syncTimerId = setInterval(function() {
-		if ((syncBufferSize == 0 && rawReadBuffer1 == null) ||
-			(rawReadBuffer1 != null && syncBufferSize == rawReadBuffer1.length)) {
-			clearInterval(syncTimerId);
-			getDeviceData();
-		} if (rawReadBuffer1 != null) {
-			syncBufferSize = rawReadBuffer1.length; 
+				},
+				{
+					measurement: "heatmeter.g",
+				    tags: { node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g1
+				    }
+				},
+				{
+					measurement: "heatmeter.q",
+				    tags: { node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.q1
+				    }
+				},
+				{
+					measurement: "heatmeter.v",
+				    tags: { node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.v1
+				    }
+				},
+				{
+					measurement: "heatmeter.t1",
+				    tags: { node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.t1
+				    }
+				},
+				{
+					measurement: "heatmeter.t2",
+				    tags: { node: daqNode},
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.t2
+				    }
+				},
+			]);
 		}
-	}, 500);
+	});
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

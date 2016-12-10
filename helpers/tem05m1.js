@@ -186,59 +186,76 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 	var that = this;
 
 	try {
-		rawReadFunc(3000, function (err, rawData) {
-			try {				
-				if (rawData && rawData.length == 344) {
+		var pollDevice = function () {
+			rawReadFunc(3000, function (err, rawData) {
+				try {				
+					if (rawData && rawData.length == 344) {
 
-					var year = readBcd8(rawData, 0x9);
+						var year = readBcd8(rawData, 0x9);
 
-					if (year < 90) {
-						year += 2000;
-					} else if (year < 100) {
-						year += 1900;
+						if (year < 90) {
+							year += 2000;
+						} else if (year < 100) {
+							year += 1900;
+						}
+
+						console.log(readUInt24LE(rawData, 0x20));
+
+						cb(null, {
+							"date": new Date(year, 
+							readBcd8(rawData, 0x8) - 1, 
+							readBcd8(rawData, 0x7),
+							readBcd8(rawData, 0x4), 
+							readBcd8(rawData, 0x2), 
+							readBcd8(rawData, 0x0)),
+							"device_serial": rawData.readUInt16LE(0xE),
+							"fw_version": rawData[0x10],
+							"device_config": readHeatmeterConfig(rawData, 0x11),
+							"operating_hours": rawData[0x18] / 60 + readUInt24LE(rawData, 0x19),
+							"g1_min": readMaxConsumption(rawData, 0x12) * (rawData[0x14] & 0xF) / 100,
+							"g1_max": readMaxConsumption(rawData, 0x12),
+							"g2_min": readMaxConsumption(rawData, 0x13) * (rawData[0x14] >> 4) / 100,
+							"g2_max": readMaxConsumption(rawData, 0x13),
+							"t3_prog": rawData[0x15] / 10,
+							"t3": rawData.readUInt16LE(0xD2) / 100,
+							"g1": readUInt24LE(rawData, 0x20) * 100 / readPrecision(rawData, 0x12),
+							"p1": readUInt24LE(rawData, 0x23) / readPrecision(rawData, 0x12),
+							"q1": readUInt24LE(rawData, 0x26) * 10 / readPrecision(rawData, 0x12),
+							"v1": readUInt24LE(rawData, 0x29) / readPrecision(rawData, 0x12),
+							"m1": readUInt24LE(rawData, 0x2C) / readPrecision(rawData, 0x12),
+							"t1": rawData.readUInt16LE(0xCE) / 100,
+							"g2": readUInt24LE(rawData, 0x2F) * 100 / readPrecision(rawData, 0x13),
+							"p2": readUInt24LE(rawData, 0x32) / readPrecision(rawData, 0x13),
+							"q2": readUInt24LE(rawData, 0x35) * 10 / readPrecision(rawData, 0x13),
+							"v2": readUInt24LE(rawData, 0x38) / readPrecision(rawData, 0x12),
+							"m2": readUInt24LE(rawData, 0x3B) / readPrecision(rawData, 0x12),
+							"t2": rawData.readUInt16LE(0xD0) / 100,
+							"errors": readDeviceErrors(rawData, 0x3E)
+						});
+					} else {
+						cb(new Error("An error occurred when reading operating params from device"));
 					}
-
-					console.log(readUInt24LE(rawData, 0x20));
-
-					cb(null, {
-						"date": new Date(year, 
-						readBcd8(rawData, 0x8) - 1, 
-						readBcd8(rawData, 0x7),
-						readBcd8(rawData, 0x4), 
-						readBcd8(rawData, 0x2), 
-						readBcd8(rawData, 0x0)),
-						"device_serial": rawData.readUInt16LE(0xE),
-						"fw_version": rawData[0x10],
-						"device_config": readHeatmeterConfig(rawData, 0x11),
-						"operating_hours": rawData[0x18] / 60 + readUInt24LE(rawData, 0x19),
-						"g1_min": readMaxConsumption(rawData, 0x12) * (rawData[0x14] & 0xF) / 100,
-						"g1_max": readMaxConsumption(rawData, 0x12),
-						"g2_min": readMaxConsumption(rawData, 0x13) * (rawData[0x14] >> 4) / 100,
-						"g2_max": readMaxConsumption(rawData, 0x13),
-						"t3_prog": rawData[0x15] / 10,
-						"t3": rawData.readUInt16LE(0xD2) / 100,
-						"g1": readUInt24LE(rawData, 0x20) * 100 / readPrecision(rawData, 0x12),
-						"p1": readUInt24LE(rawData, 0x23) / readPrecision(rawData, 0x12),
-						"q1": readUInt24LE(rawData, 0x26) * 10 / readPrecision(rawData, 0x12),
-						"v1": readUInt24LE(rawData, 0x29) / readPrecision(rawData, 0x12),
-						"m1": readUInt24LE(rawData, 0x2C) / readPrecision(rawData, 0x12),
-						"t1": rawData.readUInt16LE(0xCE) / 100,
-						"g2": readUInt24LE(rawData, 0x2F) * 100 / readPrecision(rawData, 0x13),
-						"p2": readUInt24LE(rawData, 0x32) / readPrecision(rawData, 0x13),
-						"q2": readUInt24LE(rawData, 0x35) * 10 / readPrecision(rawData, 0x13),
-						"v2": readUInt24LE(rawData, 0x38) / readPrecision(rawData, 0x12),
-						"m2": readUInt24LE(rawData, 0x3B) / readPrecision(rawData, 0x12),
-						"t2": rawData.readUInt16LE(0xD0) / 100,
-						"errors": readDeviceErrors(rawData, 0x3E)
-					});
-				} else {
-					cb(new Error("An error occurred when reading operating params from device"));
+				} catch (e) {
+					that.journal.error(e.stack.toString());
+					cb(e);
 				}
-			} catch (e) {
-				that.journal.error(e.stack.toString());
-				cb(e);
+			});
+		};
+
+		var syncWithDeviceIterator = function (index) {
+			if (index < 10) {
+				rawReadFunc(1000, function (err, rawData) {
+					if (rawData == null || rawData.length == 0) {
+						pollDevice();
+					} else {
+						syncWithDeviceIterator(index + 1);
+					}
+				});
+			} else {
+				cb(new Error("Can't perform synchronization"));
 			}
-		});
+		};
+
 	} catch (e) {
 		that.journal.error(e.stack.toString());
 		cb(e);
