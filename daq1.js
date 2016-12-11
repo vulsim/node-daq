@@ -11,8 +11,9 @@ var influxHost = "192.168.1.111";
 var influxDatabase = "garant";
 var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
-var influxNode = "vrb86_1"
+var influxNode = "ozh42"
 var serialDevice1 = "/dev/ttyUSB0";
+var deviceAddress = 1;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -154,7 +155,7 @@ port1.on("open", function() {
 		}						
 	};
 
-	tc05.getDeviceType(readHandler, writeHandler, function (err, data) {
+	tc05.getDeviceType(readHandler, writeHandler, deviceAddress, function (err, data) {
 		port1.close();
 
 		if (err) {
@@ -164,7 +165,7 @@ port1.on("open", function() {
 			//console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %d", data.device_serial, data.fw_version, data.errors.length));
 
 			console.log(data);
-			
+
 			/*influx.writePoints([
 				{
 					measurement: util.format("%s.heatmeter.info", influxNode),

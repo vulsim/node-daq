@@ -21,9 +21,9 @@ var TC05 = Class.Inherit("TC05", Object, function (name, context) {
 	return this;
 });
 
-TC05.prototype.rawRequestPacket = function (address, func, param, dummy1, dummy2, dummy3, dummy4) {
+TC05.prototype.rawRequestPacket = function (address, func, param, dummy1, dummy2, dummy3) {
 
-	var buffer = new Buffer((func > 192) ? 9 : 8);
+	var buffer = new Buffer(8);
 	var crcSum = 0xFFFF;
 
 	buffer[0] = parseInt(address);
@@ -34,16 +34,12 @@ TC05.prototype.rawRequestPacket = function (address, func, param, dummy1, dummy2
 	buffer[4] = parseInt(dummy2);
 	buffer[5] = parseInt(dummy3);
 
-	if (func > 192) {
-		buffer[6] = parseInt(dummy4);		
-	}
-
 	for (var i = 0; i < buffer.length - 2; i++) {
 		crcSum = crc.crc16_ARC_Add(crcSum, buffer[i]);
 	}
 
-	buffer[buffer.length - 2] = (crcSum >> 8) & 0xFF;
-	buffer[buffer.length - 1] = crcSum & 0xFF;
+	buffer[6] = (crcSum >> 8) & 0xFF;
+	buffer[7] = crcSum & 0xFF;
 
 	return buffer;
 };
@@ -87,7 +83,7 @@ TC05.prototype.getDeviceType = function (rawReadFunc, rawWriteFunc, devId, cb) {
 	var that = this;
 
 	try {
-		rawWriteFunc(that.rawRequestPacket(devId, 3, 17, 0, 0 ,0, 0), function (err) {
+		rawWriteFunc(that.rawRequestPacket(devId, 3, 17, 0, 0, 0), function (err) {
 			try {
 				rawReadFunc(250, function (err, rawData) {
 					try {
