@@ -45,7 +45,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.g", influxNode),
+			measurement: util.format("%s.heatmeter.g1", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -69,6 +69,54 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
+			measurement: util.format("%s.heatmeter.q1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.v1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.m1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.p1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.t1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
 			measurement: util.format("%s.heatmeter.g2_min", influxNode),
 			tags: [],
 			fields: {
@@ -85,7 +133,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.q", influxNode),
+			measurement: util.format("%s.heatmeter.q2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -93,7 +141,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.v", influxNode),
+			measurement: util.format("%s.heatmeter.v2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -101,7 +149,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.p", influxNode),
+			measurement: util.format("%s.heatmeter.m2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -109,7 +157,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.t1", influxNode),
+			measurement: util.format("%s.heatmeter.p2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -203,9 +251,7 @@ port1.on("open", function() {
 			console.log(util.format(logMessage1, "OK"));
 			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %d", data.device_serial, data.fw_version, data.errors.length));
 
-			console.log(data);
-
-			/*influx.writePoints([
+			influx.writePoints([
 				{
 					measurement: util.format("%s.heatmeter.info", influxNode),
 				    fields: {
@@ -225,7 +271,7 @@ port1.on("open", function() {
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.g", influxNode),
+					measurement: util.format("%s.heatmeter.g1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.g1
@@ -246,6 +292,48 @@ port1.on("open", function() {
 				    }
 				},
 				{
+					measurement: util.format("%s.heatmeter.q1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.q1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.v1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.v1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.m1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.m1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.p1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.p1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.t1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.t1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.g2", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g2
+				    }
+				},
+				{
 					measurement: util.format("%s.heatmeter.g2_min", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
@@ -260,31 +348,31 @@ port1.on("open", function() {
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.q", influxNode),
+					measurement: util.format("%s.heatmeter.q2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.q1
+						value: data.q2
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.v", influxNode),
+					measurement: util.format("%s.heatmeter.v2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.v1
+						value: data.v2
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.p", influxNode),
+					measurement: util.format("%s.heatmeter.m2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.p1
+						value: data.m2
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.t1", influxNode),
+					measurement: util.format("%s.heatmeter.p2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.t1
+						value: data.p2
 				    }
 				},
 				{
@@ -294,7 +382,7 @@ port1.on("open", function() {
 						value: data.t2
 				    }
 				}
-			]);*/
+			]);
 		}
 	});
 });
@@ -303,13 +391,11 @@ port1.on("open", function() {
 
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {
-		//port1.open();
+		port1.open();
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
 	}	
 });
-
-port1.open();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
