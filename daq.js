@@ -53,6 +53,38 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
+			measurement: util.format("%s.heatmeter.g1_min", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g1_max", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2_min", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2_max", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
 			measurement: util.format("%s.heatmeter.q", influxNode),
 			tags: [],
 			fields: {
@@ -62,6 +94,14 @@ var influx = new Influx.InfluxDB({
 		},
 		{
 			measurement: util.format("%s.heatmeter.v", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.p", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -163,7 +203,9 @@ port1.on("open", function() {
 			console.log(util.format(logMessage1, "OK"));
 			console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %d", data.device_serial, data.fw_version, data.errors.length));
 
-			influx.writePoints([
+			console.log(data);
+
+			/*influx.writePoints([
 				{
 					measurement: util.format("%s.heatmeter.info", influxNode),
 				    fields: {
@@ -190,6 +232,34 @@ port1.on("open", function() {
 				    }
 				},
 				{
+					measurement: util.format("%s.heatmeter.g1_min", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g1_min
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.g1_max", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g1_max
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.g2_min", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g2_min
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.g2_max", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g2_max
+				    }
+				},
+				{
 					measurement: util.format("%s.heatmeter.q", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
@@ -201,6 +271,13 @@ port1.on("open", function() {
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.v1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.p", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.p1
 				    }
 				},
 				{
@@ -217,7 +294,7 @@ port1.on("open", function() {
 						value: data.t2
 				    }
 				}
-			]);
+			]);*/
 		}
 	});
 });
@@ -226,11 +303,13 @@ port1.on("open", function() {
 
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {
-		port1.open();
+		//port1.open();
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
 	}	
 });
+
+port1.open();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
