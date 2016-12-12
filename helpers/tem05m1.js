@@ -89,7 +89,7 @@ var readDeviceErrors = function (buffer, index) {
 
 var readMaxConsumption = function (buffer, index) {
 
-	switch (buffer[index] & 0x1F) {
+	switch (buffer[index]) {
 		case 0x0:
 			return 0.25;
 		case 0x1:
@@ -135,7 +135,7 @@ var readMaxConsumption = function (buffer, index) {
 
 var readPrecision = function (buffer, index) {
 
-	switch (buffer[index] & 0x1F) {
+	switch (buffer[index]) {
 		case 0x0:
 		case 0x1:
 			return 1000;
@@ -224,23 +224,23 @@ Tem05m1.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) 
 							"fw_version": rawData[0x10],
 							"device_config": readDeviceConfig(rawData, 0x11),
 							"operating_hours": rawData[0x18] / 60 + readUInt24LE(rawData, 0x19),
-							"g1_min": readMaxConsumption(rawData, 0x12) * (rawData[0x14] & 0xF) / 100,
-							"g1_max": readMaxConsumption(rawData, 0x12),
-							"g2_min": readMaxConsumption(rawData, 0x13) * (rawData[0x14] >> 4) / 100,
-							"g2_max": readMaxConsumption(rawData, 0x13),
 							"t3_prog": rawData[0x15] / 10,
 							"t3": rawData.readUInt16LE(0xD2) / 100,
-							"g1": readUInt24LE(rawData, 0x20) * 100 / readPrecision(rawData, 0x12),
-							"p1": readUInt24LE(rawData, 0x23) / readPrecision(rawData, 0x12),
-							"q1": readUInt24LE(rawData, 0x26) * 10 / readPrecision(rawData, 0x12),
+							"g1_min": readMaxConsumption(rawData, 0x12) * (rawData[0x14] & 0xF) / 100,
+							"g1_max": readMaxConsumption(rawData, 0x12),
+							"g1": readUInt24LE(rawData, 0x20) / readPrecision(rawData, 0x12) / 100,
+							"p1": (readUInt24LE(rawData, 0x23) / readPrecision(rawData, 0x12)) * 0.859845,
+							"q1": (readUInt24LE(rawData, 0x26) / readPrecision(rawData, 0x12) / 10) * 0.859845,
 							"v1": readUInt24LE(rawData, 0x29) / readPrecision(rawData, 0x12),
 							"m1": readUInt24LE(rawData, 0x2C) / readPrecision(rawData, 0x12),
 							"t1": rawData.readUInt16LE(0xCE) / 100,
-							"g2": readUInt24LE(rawData, 0x2F) * 100 / readPrecision(rawData, 0x13),
-							"p2": readUInt24LE(rawData, 0x32) / readPrecision(rawData, 0x13),
-							"q2": readUInt24LE(rawData, 0x35) * 10 / readPrecision(rawData, 0x13),
-							"v2": readUInt24LE(rawData, 0x38) / readPrecision(rawData, 0x12),
-							"m2": readUInt24LE(rawData, 0x3B) / readPrecision(rawData, 0x12),
+							"g2_min": readMaxConsumption(rawData, 0x13) * (rawData[0x14] >> 4) / 100,
+							"g2_max": readMaxConsumption(rawData, 0x13),
+							"g2": readUInt24LE(rawData, 0x2F) / readPrecision(rawData, 0x13) / 100,
+							"p2": (readUInt24LE(rawData, 0x32) / readPrecision(rawData, 0x13)) * 0.859845,
+							"q2": (readUInt24LE(rawData, 0x35) / readPrecision(rawData, 0x13) / 10) * 0.859845,
+							"v2": readUInt24LE(rawData, 0x38) / readPrecision(rawData, 0x13),
+							"m2": readUInt24LE(rawData, 0x3B) / readPrecision(rawData, 0x13),
 							"t2": rawData.readUInt16LE(0xD0) / 100,
 							"errors": readDeviceErrors(rawData, 0x3E)
 						});
