@@ -13,7 +13,6 @@ var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
 var influxNode = "ozh42"
 var serialDevice1 = "/dev/ttyUSB0";
-var deviceAddress = 1;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -46,7 +45,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.g", influxNode),
+			measurement: util.format("%s.heatmeter.g1", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -54,7 +53,7 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.q", influxNode),
+			measurement: util.format("%s.heatmeter.g1_min", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -62,7 +61,39 @@ var influx = new Influx.InfluxDB({
 			}
 		},
 		{
-			measurement: util.format("%s.heatmeter.v", influxNode),
+			measurement: util.format("%s.heatmeter.g1_max", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.q1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.v1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.m1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.p1", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -71,6 +102,62 @@ var influx = new Influx.InfluxDB({
 		},
 		{
 			measurement: util.format("%s.heatmeter.t1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2_min", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.g2_max", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.q2", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.v2", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.m2", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.p2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -107,9 +194,9 @@ var tc05 = new TC05("TC05", {
 });
 
 var port1 = new SerialPort(serialDevice1, {
-  baudRate: 9600,
+  baudRate: 2400,
   dataBits: 8,
-  parity: "none",
+  parity: "even",
   stopBits: 1,
   autoOpen: false
 });
@@ -155,7 +242,7 @@ port1.on("open", function() {
 		}						
 	};
 
-	tc05.getDeviceType(readHandler, writeHandler, deviceAddress, function (err, data) {
+	tc05.getDeviceType(readHandler, writeHandler, function (err, data) {
 		port1.close();
 
 		if (err) {

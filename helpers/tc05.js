@@ -21,32 +21,31 @@ var TC05 = Class.Inherit("TC05", Object, function (name, context) {
 	return this;
 });
 
-TC05.prototype.rawRequestPacket = function (address, func, param, dummy1, dummy2, dummy3) {
+TC05.prototype.rawRequestPacket = function (cmd, param1, param2) {
 
-	var buffer = new Buffer(8);
-	var crcSum = 0xFFFF;
+	var requestPacket = null;
 
-	buffer[0] = parseInt(address);
-	buffer[1] = parseInt(func);
-	buffer[2] = parseInt(param);
-	
-	buffer[3] = parseInt(dummy1);
-	buffer[4] = parseInt(dummy2);
-	buffer[5] = parseInt(dummy3);
+	if (param1 || param2) {
+		var params = param1;
 
-	for (var i = 0; i < buffer.length - 2; i++) {
-		crcSum = crc.crc16_ARC_Add(crcSum, buffer[i]);
+		if (param2 != null) {
+			params = (params != null) ? params + "," + param2 : param2;
+		}
+
+		requestPacket = util.format("%s(%s)\r", cmd, params);
+	} else {
+		requestPacket = util.format("%s%s\r", cmd);
 	}
 
-	buffer[6] = (crcSum >> 8) & 0xFF;
-	buffer[7] = crcSum & 0xFF;
-
-	return buffer;
+	return new Buffer(requestPacket);
 };
 
 TC05.prototype.rawResponsePacket = function (buffer) {
 
-	if (buffer && buffer.length > 5) {
+	var responsePacket = buffer.toString("utf8");
+	console.log(responsePacket);
+	
+	/*if (buffer && buffer.length > 5) {
 		var crcSum = 0xFFFF;
 
 		for (var i = 0; i < buffer.length - 2; i++) {
@@ -73,17 +72,17 @@ TC05.prototype.rawResponsePacket = function (buffer) {
 
 			return ret;
 		}		
-	}
+	}*/
 	
 	return null;
 };
 
-TC05.prototype.getDeviceType = function (rawReadFunc, rawWriteFunc, devId, cb) {
+TC05.prototype.getDeviceType = function (rawReadFunc, rawWriteFunc, cb) {
 
 	var that = this;
 
 	try {
-		rawWriteFunc(that.rawRequestPacket(devId, 3, 17, 0, 0, 0), function (err) {
+		rawWriteFunc(that.rawRequestPacket("RH"), function (err) {
 			try {
 				rawReadFunc(250, function (err, rawData) {
 					try {
