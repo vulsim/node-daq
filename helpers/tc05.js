@@ -103,9 +103,9 @@ TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 	var info = {};
 
 	try {
-		that.getDeviceInfo(rawReadFunc, rawWriteFunc, devId, function (err1, deviceInfo) {
+		that.getDeviceInfo(rawReadFunc, rawWriteFunc, function (err1, deviceInfo) {
 			try {
-				that.getOperatingParams(rawReadFunc, rawWriteFunc, devId, function (err2, operatingParams) {
+				that.getOperatingParams(rawReadFunc, rawWriteFunc, function (err2, operatingParams) {
 					try {
 						if (err1 || err2) {
 							cb(new Error("Device cannot be read"));
