@@ -97,7 +97,7 @@ TC05.prototype.rawResponsePacket = function (buffer) {
 	return  (response.length > 0) ? covertResponse(response) : null;
 };
 
-CC301.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, devId, cb) {
+TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 
 	var that = this;
 	var info = {};
@@ -112,26 +112,10 @@ CC301.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, devId, c
 							return;
 						}
 
-						if (deviceInfo["CT"] == null ||
-							deviceInfo["NU"] == null ||
-							deviceInfo["SV"] == null ||
-							operatingParams["1"]["T"] == null ||
-							operatingParams["1"]["T!"] == null ||
-							operatingParams["1"]["v>"] == null ||
-							operatingParams["1"]["q>"] == null ||
-							operatingParams["1"]["Q"] == null ||
-							operatingParams["1"]["V>"] == null ||
-							operatingParams["1"]["t>"] == null ||
-							operatingParams["1"]["t<"] == null ||
-							operatingParams["1"]["!?"] == null ||) {							
-							cb(new Error("Received data are malformed"));
-							return;	
-						}
-
 						cb(null, {
 							"date": new Date(Date.parse(deviceInfo["CT"])),
-							"device_serial": parseInt(deviceInfo["NU"])),
-							"fw_version": deviceInfo["SV"]),
+							"device_serial": parseInt(deviceInfo["NU"]),
+							"fw_version": deviceInfo["SV"],
 							"h": operatingParams["1"]["T"],
 							"he": operatingParams["1"]["T!"],
 							"g1": parseFloat(operatingParams["1"]["v>"]),
@@ -169,7 +153,8 @@ TC05.prototype.getDeviceInfo = function (rawReadFunc, rawWriteFunc, cb) {
 					try {
 						var data = that.rawResponsePacket(rawData);
 						
-						if (data != null) {							
+						if (data != null && data["0"] != null && data["0"]["CT"] != null &&	
+							data["0"]["NU"] != null && data["0"]["SV"] != null) {							
 							cb(null, data["0"]);
 						} else {
 							cb(new Error("An error occurred when reading from device"));
@@ -201,7 +186,10 @@ TC05.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) {
 					try {
 						var data = that.rawResponsePacket(rawData);
 						
-						if (data != null) {														
+						if (data != null && data["1"] != null && data["1"]["T"] != null && 
+							data["1"]["T!"] != null && data["1"]["v>"] != null && data["1"]["q>"] != null && 
+							data["1"]["Q"] != null && data["1"]["V>"] != null && data["1"]["t>"] != null && 
+							data["1"]["t<"] != null && data["1"]["!?"] != null) {														
 							cb(null, data);
 						} else {
 							cb(new Error("An error occurred when reading from device"));
