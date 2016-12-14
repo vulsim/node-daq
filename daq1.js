@@ -3,6 +3,7 @@ var schedule = require("node-schedule");
 var Influx = require("influx");
 var SerialPort = require('serialport');
 var util = require("util");
+var gpio = require("pi-gpio");
 var TC05 = require("./helpers/tc05").TC05;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,6 +14,7 @@ var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
 var influxNode = "ozh42"
 var serialDevice1 = "/dev/ttyUSB0";
+var serialDevicePowerPin = 20;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -179,14 +181,16 @@ port1.on("open", function() {
 
 	tc05.getOperatingInfo(readHandler, writeHandler, function (err, data) {
 		port1.close();
+		
+		gpio.write(serialDevicePowerPin, 1, function() {
+			gpio.close(serialDevicePowerPin);
+		});
 
 		if (err) {
 		    console.log(util.format(logMessage1, "FAILED"));		    
 		} else {
 			console.log(util.format(logMessage1, "OK"));
 			console.log(util.format("\t\\- Device serial: %d, fw: %s, errors: %s", data.device_serial, data.fw_version, data.errors));
-
-			console.log(data);
 
 			influx.writePoints([
 				{
@@ -271,13 +275,15 @@ port1.on("open", function() {
 
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {
-		//port1.open();
+		gpio.open(serialDevicePowerPin, "output", function(err) {
+		    gpio.write(serialDevicePowerPin, 0, function() {
+		        port1.open();
+		    });
+		});
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
 	}	
 });
-
-port1.open();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
