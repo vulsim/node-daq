@@ -275,7 +275,11 @@ gpio.write(serialDevicePowerPin, 1);
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {		
 		gpio.write(serialDevicePowerPin, 0);
-		port1.open();		
+
+		var gpioTimerId = setInterval(function() {
+			clearInterval(gpioTimerId);
+			port1.open();
+		}, 1000);
 
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
