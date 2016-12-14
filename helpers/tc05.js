@@ -112,7 +112,7 @@ TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 							return;
 						}
 
-						var dateTime = deviceInfo["CT"].split("\s");
+						var dateTime = deviceInfo["CT"].split(" ");
 						var dateComponents = dateTime[0].split("-");
 						var timeComponents = dateTime[1].split(":");
 						var year = parseInt(dateComponents[2]);
@@ -129,7 +129,6 @@ TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 							parseInt(dateComponents[0]),
 							parseInt(timeComponents[0]), 
 							parseInt(timeComponents[1])),
-							"date": new Date(Date.parse()),
 							"device_serial": parseInt(deviceInfo["NU"]),
 							"fw_version": deviceInfo["SV"],
 							"h": operatingParams["1"]["T"],
