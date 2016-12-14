@@ -32,36 +32,27 @@ var influx = new Influx.InfluxDB({
 				device_type: Influx.FieldType.STRING,
 				device_serial: Influx.FieldType.INTEGER,
 				device_date: Influx.FieldType.STRING,
-				fw_version: Influx.FieldType.INTEGER,
-				operating_hours: Influx.FieldType.INTEGER,
-				error_0: Influx.FieldType.INTEGER,
-				error_1: Influx.FieldType.INTEGER,
-				error_2: Influx.FieldType.INTEGER,
-				error_3: Influx.FieldType.INTEGER,
-				error_4: Influx.FieldType.INTEGER,
-				error_5: Influx.FieldType.INTEGER,
-				error_6: Influx.FieldType.INTEGER,
-				error_7: Influx.FieldType.INTEGER
+				fw_version: Influx.FieldType.STRING,
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.h", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.he", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
 			}
 		},
 		{
 			measurement: util.format("%s.heatmeter.g1", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.g1_min", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.g1_max", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -102,62 +93,6 @@ var influx = new Influx.InfluxDB({
 		},
 		{
 			measurement: util.format("%s.heatmeter.t1", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.g2", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.g2_min", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.g2_max", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.q2", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.v2", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.m2", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.p2", influxNode),
 			tags: [],
 			fields: {
 				device_serial: Influx.FieldType.INTEGER,
@@ -242,55 +177,75 @@ port1.on("open", function() {
 		}						
 	};
 
-	tc05.getDeviceInfo(readHandler, writeHandler, function (err, data) {
+	tc05.getOperatingInfo(readHandler, writeHandler, function (err, data) {
 		port1.close();
 
 		if (err) {
 		    console.log(util.format(logMessage1, "FAILED"));		    
 		} else {
 			console.log(util.format(logMessage1, "OK"));
-			//console.log(util.format("\t\\- Device serial: %d, fw: %d, errors: %d", data.device_serial, data.fw_version, data.errors.length));
+			console.log(util.format("\t\\- Device serial: %d, fw: %s, errors: %s", data.device_serial, data.fw_version, data.errors));
 
 			console.log(data);
 
-			/*influx.writePoints([
+			influx.writePoints([
 				{
 					measurement: util.format("%s.heatmeter.info", influxNode),
 				    fields: {
-				    	device_type: "tem05m1",
+				    	device_type: "tc05",
 				    	device_serial: data.device_serial,
 				    	device_date: data.date.toString(),					
-						fw_version: data.fw_version,
-						operating_hours: data.operating_hours,
-						error_0: (data.errors.indexOf("t_sensor_failure") > -1) ? 1 : 0,
-						error_1: (data.errors.indexOf("flow_or_pressure_sensor_failure") > -1) ? 1 : 0,
-						error_2: (data.errors.indexOf("g1_under_min") > -1) ? 1 : 0,
-						error_3: (data.errors.indexOf("g2_under_min") > -1) ? 1 : 0,
-						error_4: (data.errors.indexOf("g1_over_max") > -1) ? 1 : 0,
-						error_5: (data.errors.indexOf("g2_over_max") > -1) ? 1 : 0,
-						error_6: (data.errors.indexOf("dt_under_min") > -1) ? 1 : 0,
-						error_7: (data.errors.indexOf("power_failure") > -1 ? 1 : 0)
+						fw_version: data.fw_version.toString(),						
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.g", influxNode),
+					measurement: util.format("%s.heatmeter.h", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.h
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.he", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.he
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.g1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.g1
 				    }
 				},
+				
 				{
-					measurement: util.format("%s.heatmeter.q", influxNode),
+					measurement: util.format("%s.heatmeter.q1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.q1
 				    }
 				},
 				{
-					measurement: util.format("%s.heatmeter.v", influxNode),
+					measurement: util.format("%s.heatmeter.v1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
 						value: data.v1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.m1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.m1
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.p1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.p1
 				    }
 				},
 				{
@@ -307,7 +262,7 @@ port1.on("open", function() {
 						value: data.t2
 				    }
 				}
-			]);*/
+			]);
 		}
 	});
 });

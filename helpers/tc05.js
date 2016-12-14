@@ -7,7 +7,6 @@ var CJournal = require("../helpers/cjournal").CJournal;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var util = require("util");
-var crc = require("../helpers/crc");
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +44,7 @@ var covertResponse = function (response) {
 			object[block[0]] = circuit;
 		}
 
-		circuit[block[1]] = block[2];
+		circuit[block[1].replace(/\s/g, "")] = block[2];
 	}
 
 	return object;
@@ -98,6 +97,67 @@ TC05.prototype.rawResponsePacket = function (buffer) {
 	return  (response.length > 0) ? covertResponse(response) : null;
 };
 
+CC301.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, devId, cb) {
+
+	var that = this;
+	var info = {};
+
+	try {
+		that.getDeviceInfo(rawReadFunc, rawWriteFunc, devId, function (err1, deviceInfo) {
+			try {
+				that.getOperatingParams(rawReadFunc, rawWriteFunc, devId, function (err2, operatingParams) {
+					try {
+						if (err1 || err2) {
+							cb(new Error("Device cannot be read"));
+							return;
+						}
+
+						if (deviceInfo["CT"] == null ||
+							deviceInfo["NU"] == null ||
+							deviceInfo["SV"] == null ||
+							operatingParams["1"]["T"] == null ||
+							operatingParams["1"]["T!"] == null ||
+							operatingParams["1"]["v>"] == null ||
+							operatingParams["1"]["q>"] == null ||
+							operatingParams["1"]["Q"] == null ||
+							operatingParams["1"]["V>"] == null ||
+							operatingParams["1"]["t>"] == null ||
+							operatingParams["1"]["t<"] == null ||
+							operatingParams["1"]["!?"] == null ||) {							
+							cb(new Error("Received data are malformed"));
+							return;	
+						}
+
+						cb(null, {
+							"date": new Date(Date.parse(deviceInfo["CT"])),
+							"device_serial": parseInt(deviceInfo["NU"])),
+							"fw_version": deviceInfo["SV"]),
+							"h": operatingParams["1"]["T"],
+							"he": operatingParams["1"]["T!"],
+							"g1": parseFloat(operatingParams["1"]["v>"]),
+							"p1": parseFloat(operatingParams["1"]["q>"]),
+							"q1": parseFloat(operatingParams["1"]["Q"]),
+							"v1": parseFloat(operatingParams["1"]["V>"]),
+							"t1": parseFloat(operatingParams["1"]["t>"]),
+							"t2": parseFloat(operatingParams["1"]["t<"]),
+							"errors": operatingParams["1"]["!?"]
+						});								
+					} catch (e) {
+						that.journal.error(e.stack.toString());
+						cb(e);
+					}			
+				});
+			} catch (e) {
+				that.journal.error(e.stack.toString());
+				cb(e);
+			}			
+		});		
+	} catch (e) {
+		that.journal.error(e.stack.toString());
+		cb(e);
+	}
+};
+
 TC05.prototype.getDeviceInfo = function (rawReadFunc, rawWriteFunc, cb) {
 
 	var that = this;
@@ -110,9 +170,39 @@ TC05.prototype.getDeviceInfo = function (rawReadFunc, rawWriteFunc, cb) {
 						var data = that.rawResponsePacket(rawData);
 						
 						if (data != null) {							
-							console.log(data);
+							cb(null, data["0"]);
+						} else {
+							cb(new Error("An error occurred when reading from device"));
+						}
+					} catch (e) {
+						that.journal.error(e.stack.toString());
+						cb(e);
+					}
+				});
+			} catch (e) {
+				that.journal.error(e.stack.toString());
+				cb(e);
+			}
+		});
+	} catch (e) {
+		that.journal.error(e.stack.toString());
+		cb(e);
+	}
+};
 
-							//cb(null, data);
+TC05.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) {
+
+	var that = this;
+
+	try {
+		rawWriteFunc(that.rawRequestPacket("RH"), function (err) {
+			try {
+				rawReadFunc(2000, function (err, rawData) {
+					try {
+						var data = that.rawResponsePacket(rawData);
+						
+						if (data != null) {														
+							cb(null, data);
 						} else {
 							cb(new Error("An error occurred when reading from device"));
 						}
