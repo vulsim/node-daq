@@ -316,11 +316,13 @@ port1.on("open", function() {
 
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {
-		port1.open();
+		//port1.open();
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
 	}	
 });
+
+port1.open();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

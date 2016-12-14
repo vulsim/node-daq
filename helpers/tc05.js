@@ -42,9 +42,11 @@ TC05.prototype.rawRequestPacket = function (cmd, param1, param2) {
 
 TC05.prototype.rawResponsePacket = function (buffer) {
 
-	var responsePacket = buffer.toString("utf8");
-	console.log(responsePacket);
-	
+	//var responsePacket = buffer.toString("utf8");
+	//console.log(responsePacket);
+
+	console.log(buffer);
+
 	/*if (buffer && buffer.length > 5) {
 		var crcSum = 0xFFFF;
 
@@ -84,7 +86,7 @@ TC05.prototype.getDeviceType = function (rawReadFunc, rawWriteFunc, cb) {
 	try {
 		rawWriteFunc(that.rawRequestPacket("RH"), function (err) {
 			try {
-				rawReadFunc(250, function (err, rawData) {
+				rawReadFunc(4000, function (err, rawData) {
 					try {
 						var data = that.rawResponsePacket(rawData);
 						if (data && data.data && data.func == 3 && data.param == 17 && data.result == 0) {
