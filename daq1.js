@@ -181,10 +181,7 @@ port1.on("open", function() {
 
 	tc05.getOperatingInfo(readHandler, writeHandler, function (err, data) {
 		port1.close();
-		
-		gpio.write(serialDevicePowerPin, 1, function() {
-			gpio.close(serialDevicePowerPin);
-		});
+		gpio.write(serialDevicePowerPin, 1);
 
 		if (err) {
 		    console.log(util.format(logMessage1, "FAILED"));		    
@@ -273,13 +270,12 @@ port1.on("open", function() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+gpio.open(serialDevicePowerPin, "output");
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
-	try {
-		gpio.open(serialDevicePowerPin, "output", function(err) {
-		    gpio.write(serialDevicePowerPin, 0, function() {
-		        port1.open();
-		    });
-		});
+	try {		
+		gpio.write(serialDevicePowerPin, 0);
+		port1.open();		
+
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
