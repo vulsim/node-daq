@@ -83,6 +83,10 @@ TC05.prototype.rawRequestPacket = function (cmd, param1, param2) {
 
 TC05.prototype.rawResponsePacket = function (buffer) {
 
+	if (buffer == null) {
+		return null;
+	}
+
 	var responsePacket = buffer.toString("ascii").split("\r");
 	var response = [];
 
@@ -94,7 +98,7 @@ TC05.prototype.rawResponsePacket = function (buffer) {
 		}
 	}
 
-	return  (response.length > 0) ? covertResponse(response) : null;
+	return (response.length > 0) ? covertResponse(response) : null;
 };
 
 TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
