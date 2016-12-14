@@ -14,7 +14,7 @@ var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
 var influxNode = "ozh42"
 var serialDevice1 = "/dev/ttyUSB0";
-var serialDevicePowerPin = 20;
+var serialDevicePowerPin = 38;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -270,7 +270,8 @@ port1.on("open", function() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-gpio.open(serialDevicePowerPin, "output");
+gpio.write(serialDevicePowerPin, 1);
+
 var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
 	try {		
 		gpio.write(serialDevicePowerPin, 0);
