@@ -242,7 +242,7 @@ port1.on("open", function() {
 		}						
 	};
 
-	tc05.getDeviceType(readHandler, writeHandler, function (err, data) {
+	tc05.getDeviceInfo(readHandler, writeHandler, function (err, data) {
 		port1.close();
 
 		if (err) {
