@@ -29,13 +29,14 @@ var isValidBlock = function (block) {
 
 	sum = sum & 0xFF;
 
-	return (block[block.length - 1] === sum.toString(16));
+	return (block[block.length - 1].toUpperCase() === sum.toString(16).toUpperCase());
 };
 
 var covertResponse = function (response) {
 	var object = {};
 
-	for (var block in response) {		
+	for (var i = 0; i < response.length; i++) {
+		var block = response[i];
 		var circuit = {};
 
 		if (object[block[0]] != undefined) {
@@ -86,11 +87,11 @@ TC05.prototype.rawResponsePacket = function (buffer) {
 	var responsePacket = buffer.toString("ascii").split("\r");
 	var response = [];
 
-	for (rawBlock in responsePacket) {
-		var block = rawBlock.split("\t");
+	for (var i = 0; i < responsePacket.length - 1; i++) {
+		var block = responsePacket[i].split("\t");
 
 		if (isValidBlock(block)) {
-			response.push(block)
+			response.push(block);
 		}
 	}
 
