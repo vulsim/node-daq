@@ -28,7 +28,7 @@ var isValidBlock = function (block) {
 
 	sum = sum & 0xFF;
 
-	return (block[block.length - 1].toUpperCase() === sum.toString(16).toUpperCase());
+	return (sum == parseInt(block[block.length - 1], 16));
 };
 
 var covertResponse = function (response) {
@@ -112,8 +112,24 @@ TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 							return;
 						}
 
+						var dateTime = deviceInfo["CT"].split("\s");
+						var dateComponents = dateTime[0].split("-");
+						var timeComponents = dateTime[1].split(":");
+						var year = parseInt(dateComponents[2]);
+
+						if (year < 90) {
+							year += 2000;
+						} else if (year < 100) {
+							year += 1900;
+						}
+
 						cb(null, {
-							"date": new Date(Date.parse(deviceInfo["CT"])),
+							"date": new Date(year, 
+							parseInt(dateComponents[1]) - 1, 
+							parseInt(dateComponents[0]),
+							parseInt(timeComponents[0]), 
+							parseInt(timeComponents[1])),
+							"date": new Date(Date.parse()),
 							"device_serial": parseInt(deviceInfo["NU"]),
 							"fw_version": deviceInfo["SV"],
 							"h": operatingParams["1"]["T"],
@@ -180,7 +196,7 @@ TC05.prototype.getOperatingParams = function (rawReadFunc, rawWriteFunc, cb) {
 	var that = this;
 
 	try {
-		rawWriteFunc(that.rawRequestPacket("RH"), function (err) {
+		rawWriteFunc(that.rawRequestPacket("RD"), function (err) {
 			try {
 				rawReadFunc(2000, function (err, rawData) {
 					try {
