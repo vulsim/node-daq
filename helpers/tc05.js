@@ -149,7 +149,7 @@ TC05.prototype.getOperatingInfo = function (rawReadFunc, rawWriteFunc, cb) {
 							"q21": parseFloat(operatingParams["2"]["Q"]),
 							"v21": parseFloat(operatingParams["2"]["V"]),
 							"t21": parseFloat(operatingParams["2"]["t>"]),
-							"errors1": operatingParams["2"]["!?"],
+							"errors2": operatingParams["2"]["!?"],
 						});								
 					} catch (e) {
 						that.journal.error(e.stack.toString());

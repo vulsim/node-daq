@@ -227,7 +227,7 @@ port1.on("open", function() {
 		    console.log(util.format(logMessage1, "FAILED"));		    
 		} else {
 			console.log(util.format(logMessage1, "OK"));
-			console.log(util.format("\t\\- Device serial: %d, fw: %s, errors: %s", data.device_serial, data.fw_version, data.errors));
+			console.log(util.format("\t\\- Device serial: %d, fw: %s, errors: %s", data.device_serial, data.fw_version, data.errors1));
 
 			influx.writePoints([
 				{
