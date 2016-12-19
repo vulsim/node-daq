@@ -68,7 +68,7 @@ var influx = new Influx.InfluxDB({
 				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
-		},
+		},		
 		{
 			measurement: util.format("%s.heatmeter.v1", influxNode),
 			tags: [],
@@ -76,7 +76,7 @@ var influx = new Influx.InfluxDB({
 				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
-		},
+		},				
 		{
 			measurement: util.format("%s.heatmeter.m1", influxNode),
 			tags: [],
@@ -100,7 +100,7 @@ var influx = new Influx.InfluxDB({
 				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
-		},
+		},		
 		{
 			measurement: util.format("%s.heatmeter.t2", influxNode),
 			tags: [],
@@ -108,7 +108,47 @@ var influx = new Influx.InfluxDB({
 				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
-		}
+		},
+		{
+			measurement: util.format("%s.heatmeter.water.h", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.water.he", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.water.q1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.water.v1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
+		{
+			measurement: util.format("%s.heatmeter.water.t1", influxNode),
+			tags: [],
+			fields: {
+				device_serial: Influx.FieldType.INTEGER,
+				value: Influx.FieldType.FLOAT
+			}
+		},
 	]
 });
 
@@ -203,64 +243,99 @@ port1.on("open", function() {
 					measurement: util.format("%s.heatmeter.h", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.h
+						value: data.h1
 				    }
 				},
 				{
 					measurement: util.format("%s.heatmeter.he", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.he
-				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.g1", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.g1
+						value: data.he1
 				    }
 				},
 				
 				{
+					measurement: util.format("%s.heatmeter.g1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.g11
+				    }
+				},
+				{
 					measurement: util.format("%s.heatmeter.q1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.q1
+						value: data.q11
 				    }
-				},
+				},				
 				{
 					measurement: util.format("%s.heatmeter.v1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.v1
+						value: data.v11
 				    }
-				},
+				},				
 				{
 					measurement: util.format("%s.heatmeter.m1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.m1
+						value: data.m11
 				    }
 				},
 				{
 					measurement: util.format("%s.heatmeter.p1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.p1
+						value: data.p11
 				    }
-				},
+				},			
 				{
 					measurement: util.format("%s.heatmeter.t1", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.t1
+						value: data.t11
 				    }
 				},
 				{
 					measurement: util.format("%s.heatmeter.t2", influxNode),
 				    fields: { 
 				    	device_serial: data.device_serial,
-						value: data.t2
+						value: data.t12
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.water.h", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.h2
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.water.he", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.he2
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.water.q1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.q21
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.water.v2", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.v21
+				    }
+				},
+				{
+					measurement: util.format("%s.heatmeter.water.t1", influxNode),
+				    fields: { 
+				    	device_serial: data.device_serial,
+						value: data.t21
 				    }
 				}
 			]);
