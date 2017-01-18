@@ -1,5 +1,4 @@
 
-var schedule = require("node-schedule");
 var Influx = require("influx");
 var SerialPort = require('serialport');
 var util = require("util");
@@ -13,6 +12,7 @@ var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
 var influxNode = "vrb86_1"
 var serialDevice1 = "/dev/ttyUSB0";
+var pollInterval = 10 * 60 * 1000;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -213,10 +213,8 @@ port1.on("open", function() {
 
 	var readHandler = function(timeout, rawReadCb) {
 		try {
-			var rawReadTimerId = setInterval(function() {
+			setTimeout(function() {
 				try {
-					clearInterval(rawReadTimerId);
-
 					if (rawReadBuffer1 != null) {
 						rawReadCb(null, rawReadBuffer1);
 						rawReadBuffer1 = null;
@@ -389,13 +387,20 @@ port1.on("open", function() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
+var daq = function () {
 	try {
 		port1.open();
 		console.log(util.format(logMessage2, "OK"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
-	}	
+	}
+}
+
+setImmediate(function() {
+	daq();
+	setInterval(function() {
+		daq();
+	}, pollInterval);
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

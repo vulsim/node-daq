@@ -1,5 +1,4 @@
 
-var schedule = require("node-schedule");
 var Influx = require("influx");
 var SerialPort = require('serialport');
 var util = require("util");
@@ -15,6 +14,7 @@ var influxDatabasePassword = "influx";
 var influxNode = "ozh42"
 var serialDevice1 = "/dev/ttyUSB0";
 var serialDevicePowerPin = 38;
+var pollInterval = 10 * 60 * 1000;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
@@ -347,19 +347,26 @@ port1.on("open", function() {
 
 gpio.write(serialDevicePowerPin, 1);
 
-var daq_job = schedule.scheduleJob("*/10 * * * *", function() {
+var daq = function () {
 	try {		
 		gpio.write(serialDevicePowerPin, 0);
 
-		var gpioTimerId = setInterval(function() {
-			clearInterval(gpioTimerId);
+		setTimeout(function() {
 			port1.open();
+			console.log(util.format(logMessage2, "OK"));
 		}, 1000);
 
-		console.log(util.format(logMessage2, "OK"));
+		console.log(util.format(logMessage2, "PENDING"));
 	} catch (err) {
 		console.log(util.format(logMessage2, "FAILED"));
 	}	
+}
+
+setImmediate(function() {
+	daq();
+	setInterval(function() {
+		daq();
+	}, pollInterval);
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
