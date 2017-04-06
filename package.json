@@ -1,0 +1,9 @@
+{
+  "name": "daq",
+  "version": "1.0.0",
+  "devDependencies": {
+    "pi-gpio": "latest",
+    "serialport": "latest",
+    "influx": "latest"
+  }
+}
