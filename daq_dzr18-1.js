@@ -11,13 +11,14 @@ var influxHost = "192.168.1.111";
 var influxDatabase = "garant";
 var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
-var influxNode = "ozh42"
+var influxNode = "dzr18-1"
 var serialDevice1 = "/dev/ttyUSB0";
 var serialDevicePowerPin = 38;
 var pollInterval = 10 * 60 * 1000;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
 var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
+var logMessage3 = "->\tPreparing GPIO port\t\t\t\t%s";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -108,47 +109,7 @@ var influx = new Influx.InfluxDB({
 				device_serial: Influx.FieldType.INTEGER,
 				value: Influx.FieldType.FLOAT
 			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.water.h", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.water.he", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.water.q1", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.water.v1", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
-		{
-			measurement: util.format("%s.heatmeter.water.t1", influxNode),
-			tags: [],
-			fields: {
-				device_serial: Influx.FieldType.INTEGER,
-				value: Influx.FieldType.FLOAT
-			}
-		},
+		}
 	]
 });
 
@@ -302,41 +263,6 @@ port1.on("open", function() {
 				    	device_serial: data.device_serial,
 						value: data.t12
 				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.water.h", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.h2
-				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.water.he", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.he2
-				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.water.q1", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.q21
-				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.water.v2", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.v21
-				    }
-				},
-				{
-					measurement: util.format("%s.heatmeter.water.t1", influxNode),
-				    fields: { 
-				    	device_serial: data.device_serial,
-						value: data.t21
-				    }
 				}
 			]);
 		}
@@ -344,8 +270,6 @@ port1.on("open", function() {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-gpio.write(serialDevicePowerPin, 1);
 
 var daq = function () {
 	try {		
@@ -362,11 +286,16 @@ var daq = function () {
 	}	
 }
 
-setImmediate(function() {
-	daq();
-	setInterval(function() {
-		daq();
-	}, pollInterval);
+gpio.open(serialDevicePowerPin, "output", function (err) {
+    console.log(util.format(logMessage3, (err != null) ? "SKIPPED" : "OK"));
+    gpio.write(serialDevicePowerPin, 1);
+    
+	setImmediate(function() {
+		daq();		
+		setInterval(function() {
+			daq();
+		}, pollInterval);
+	});
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
