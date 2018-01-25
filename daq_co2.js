@@ -6,13 +6,13 @@ var Mhz19 = require("./helpers/mhz19").Mhz19;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var influxHost = "192.168.1.111";
-var influxDatabase = "garant";
+var influxHost = "192.168.94.174";
+var influxDatabase = "instinctools";
 var influxDatabaseUser = "daq";
 var influxDatabasePassword = "influx";
-var influxNode = "unv14"
+var influxNode = "univermag_room14"
 var serialDevice1 = "/dev/tty.usbserial";
-var pollInterval = 20 * 1000;
+var pollInterval = 60 * 1000;
 var nSensorSerial = 4001;
 
 var logMessage1 = "->\tRead data from device\t\t\t\t%s";
@@ -20,7 +20,7 @@ var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*var influx = new Influx.InfluxDB({
+var influx = new Influx.InfluxDB({
 	host: influxHost,
 	database: influxDatabase,
 	username: influxDatabaseUser,
@@ -31,7 +31,8 @@ var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
 			tags: [],
 			fields: {
 				device_type: Influx.FieldType.STRING,
-				device_serial: Influx.FieldType.INTEGER
+				device_serial: Influx.FieldType.INTEGER,
+				device_date: Influx.FieldType.STRING
 			}
 		},
 		{
@@ -43,7 +44,7 @@ var logMessage2 = "->\tStarting of scheduled devices polling\t\t%s";
 			}
 		}
 	]
-});*/
+});
 
 var rawReadBuffer1 = null;
 
@@ -119,7 +120,7 @@ port1.on("open", function() {
 			console.log(util.format(logMessage1, "OK"));
 			console.log(util.format("\t\\- Device serial: %d, CO2: %dppm", data.device_serial, data.cppm));
 
-			/*influx.writePoints([
+			influx.writePoints([
 				{
 					measurement: util.format("%s.sensor.info", influxNode),
 				    fields: {
@@ -135,7 +136,7 @@ port1.on("open", function() {
 						value: data.cppm
 				    }
 				}
-			]);*/
+			]);
 		}
 	});
 });
